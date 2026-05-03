@@ -17,6 +17,12 @@ from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 import sys
 
+# PyInstaller に python-multipart を強制的に認識させるためのダミーインポート
+try:
+    import multipart
+except ImportError:
+    pass
+
 from pipeline.okhsl import linear_srgb_to_okhsl, okhsl_to_linear_srgb
 from pipeline.color_space import srgb_oetf, apply_target_oetf
 from pipeline.tone_curve import generate_lut_from_control_points, apply_tone_curve_okhsl

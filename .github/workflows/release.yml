@@ -46,6 +46,7 @@ jobs:
             --hidden-import numpy \
             --hidden-import tifffile \
             --hidden-import multipart \
+            --hidden-import python_multipart \
             --exclude-module scipy \
             --exclude-module matplotlib \
             --exclude-module pandas \
@@ -64,6 +65,7 @@ jobs:
             --hidden-import numpy `
             --hidden-import tifffile `
             --hidden-import multipart `
+            --hidden-import python_multipart `
             --exclude-module scipy `
             --exclude-module matplotlib `
             --exclude-module pandas `
