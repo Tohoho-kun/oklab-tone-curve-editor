@@ -19,7 +19,7 @@ jobs:
           - os: macos-latest
             artifact_name: OkhslToneCurve_mac.zip
           - os: windows-latest
-            artifact_name: OkhslToneCurve_win.exe
+            artifact_name: OkhslToneCurve_win.zip
 
     steps:
       - name: Checkout code
@@ -38,10 +38,13 @@ jobs:
       - name: Build with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller --noconsole --onefile \
+          # Mac: Standard --onedir build for better compatibility
+          pyinstaller --noconsole --onedir \
             --name "OkhslToneCurve" \
             --add-data "frontend:frontend" \
             --paths "backend" \
+            --hidden-import numpy \
+            --hidden-import tifffile \
             --exclude-module scipy \
             --exclude-module matplotlib \
             --exclude-module pandas \
@@ -52,26 +55,25 @@ jobs:
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --noconsole --onefile `
+          # Windows: --onefile is usually fine, but let's use --onedir for debugging and reliability
+          pyinstaller --noconsole --onedir `
             --name "OkhslToneCurve" `
             --add-data "frontend;frontend" `
             --paths "backend" `
+            --hidden-import numpy `
+            --hidden-import tifffile `
             --exclude-module scipy `
             --exclude-module matplotlib `
             --exclude-module pandas `
             backend/launcher.py
-          if (Test-Path dist/OkhslToneCurve.exe) {
-            Move-Item dist/OkhslToneCurve.exe ./OkhslToneCurve_win.exe
-          } else {
-            echo "Error: OkhslToneCurve.exe not found in dist/"
-            exit 1
-          }
+          cd dist
+          Compress-Archive -Path OkhslToneCurve -DestinationPath ../OkhslToneCurve_win.zip
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             OkhslToneCurve_mac.zip
-            OkhslToneCurve_win.exe
+            OkhslToneCurve_win.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
