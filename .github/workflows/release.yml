@@ -45,8 +45,7 @@ jobs:
             --paths "backend" \
             --hidden-import numpy \
             --hidden-import tifffile \
-            --hidden-import multipart \
-            --hidden-import python_multipart \
+            --collect-all multipart \
             --exclude-module scipy \
             --exclude-module matplotlib \
             --exclude-module pandas \
@@ -64,8 +63,7 @@ jobs:
             --paths "backend" `
             --hidden-import numpy `
             --hidden-import tifffile `
-            --hidden-import multipart `
-            --hidden-import python_multipart `
+            --collect-all multipart `
             --exclude-module scipy `
             --exclude-module matplotlib `
             --exclude-module pandas `
