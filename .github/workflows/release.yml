@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build for ${{ matrix.os }}
@@ -59,7 +62,12 @@ jobs:
             --exclude-module matplotlib `
             --exclude-module pandas `
             launcher.py
-          Move-Item dist/OkhslToneCurve.exe ../OkhslToneCurve_win.exe
+          if (Test-Path dist/OkhslToneCurve.exe) {
+            Move-Item dist/OkhslToneCurve.exe ../OkhslToneCurve_win.exe
+          } else {
+            echo "Error: OkhslToneCurve.exe not found in dist/"
+            exit 1
+          }
 
       - name: Release
         uses: softprops/action-gh-release@v2
