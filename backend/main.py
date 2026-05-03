@@ -250,7 +250,8 @@ async def export_image(req: ExportRequest):
         ss_lut, ls_lut = _build_saturation_luts(req)
 
         # Determine processing dtype
-        proc_dtype = np.float32 if (req.output_format in ('tiff', 'tif') and req.bit_depth == 16) else np.float16
+        # Force float32 for export to ensure quality and compatibility
+        proc_dtype = np.float32
 
         okhsl_adj, _ = _okhsl_core(
             s.full_linear.astype(proc_dtype), req.control_points,
@@ -281,7 +282,20 @@ async def export_image(req: ExportRequest):
     try:
         img_bytes, fmt = await run_in_threadpool(process)
     except Exception as e:
-        logger.error(f"Export Critical Error: {str(e)}")
+        import traceback
+        import os
+        err_msg = traceback.format_exc()
+        logger.error(f"Export Critical Error: {err_msg}")
+        
+        # 実行時エラーをデスクトップのログにも記録
+        try:
+            log_path = os.path.expanduser("~/Desktop/okhsl_error_log.txt")
+            with open(log_path, "a") as f:
+                f.write(f"\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] Export Error:\n")
+                f.write(err_msg + "\n" + "-"*40 + "\n")
+        except:
+            pass
+
         raise HTTPException(status_code=500, detail=str(e))
     logger.info(f"Export Success: {fmt} ({len(img_bytes)} bytes)")
     mime = {'jpeg':'image/jpeg','jpg':'image/jpeg','png':'image/png',
