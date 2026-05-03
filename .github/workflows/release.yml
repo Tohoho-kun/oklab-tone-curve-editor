@@ -1,0 +1,71 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        include:
+          - os: macos-latest
+            artifact_name: OkhslToneCurve_mac.zip
+            asset_path: backend/dist/OkhslToneCurve.app
+          - os: windows-latest
+            artifact_name: OkhslToneCurve_win.exe
+            asset_path: backend/dist/OkhslToneCurve.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller tifffile numpy fastapi uvicorn pydantic starlette pillow
+
+      - name: Build with PyInstaller (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd backend
+          pyinstaller --noconsole --onefile \
+            --name "OkhslToneCurve" \
+            --add-data "../frontend:frontend" \
+            --exclude-module scipy \
+            --exclude-module matplotlib \
+            --exclude-module pandas \
+            launcher.py
+          cd dist
+          zip -r ../../OkhslToneCurve_mac.zip OkhslToneCurve.app
+
+      - name: Build with PyInstaller (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd backend
+          pyinstaller --noconsole --onefile `
+            --name "OkhslToneCurve" `
+            --add-data "../frontend;frontend" `
+            --exclude-module scipy `
+            --exclude-module matplotlib `
+            --exclude-module pandas `
+            launcher.py
+          Move-Item dist/OkhslToneCurve.exe ../OkhslToneCurve_win.exe
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            OkhslToneCurve_mac.zip
+            OkhslToneCurve_win.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
