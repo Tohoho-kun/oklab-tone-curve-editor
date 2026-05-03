@@ -13,7 +13,7 @@ BLUE_NOISE_B64 = "UYg7bwp8GQQX5FUHkT4qewIoC7gjhIpydcgabRpZAnRpyIjWCSOmIFl2YoE8WU
 def _get_blue_noise_mask():
     """Base64からマスクを復元"""
     data = base64.b64decode(BLUE_NOISE_B64)
-    mask = np.frombuffer(data, dtype=np.uint8).reshape((64, 64))
+    mask = np.frombuffer(data, dtype=np.uint8).reshape((65, 65))
     return mask.astype(np.float32) / 255.0
 
 def apply_blue_noise_dithering(image, bit_depth=8):
@@ -28,7 +28,7 @@ def apply_blue_noise_dithering(image, bit_depth=8):
     
     # 埋め込みマスクの取得
     mask = _get_blue_noise_mask()
-    mask_size = 64
+    mask_size = 65
     
     # 画像全体にタイル状に配置
     tile_h = h // mask_size + 1
