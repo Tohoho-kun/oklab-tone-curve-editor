@@ -18,10 +18,8 @@ jobs:
         include:
           - os: macos-latest
             artifact_name: OkhslToneCurve_mac.zip
-            asset_path: backend/dist/OkhslToneCurve.app
           - os: windows-latest
             artifact_name: OkhslToneCurve_win.exe
-            asset_path: backend/dist/OkhslToneCurve.exe
 
     steps:
       - name: Checkout code
@@ -40,30 +38,30 @@ jobs:
       - name: Build with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          cd backend
           pyinstaller --noconsole --onefile \
             --name "OkhslToneCurve" \
-            --add-data "../frontend:frontend" \
+            --add-data "frontend:frontend" \
+            --paths "backend" \
             --exclude-module scipy \
             --exclude-module matplotlib \
             --exclude-module pandas \
-            launcher.py
+            backend/launcher.py
           cd dist
-          zip -r ../../OkhslToneCurve_mac.zip OkhslToneCurve.app
+          zip -r ../OkhslToneCurve_mac.zip OkhslToneCurve.app
 
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          cd backend
           pyinstaller --noconsole --onefile `
             --name "OkhslToneCurve" `
-            --add-data "../frontend;frontend" `
+            --add-data "frontend;frontend" `
+            --paths "backend" `
             --exclude-module scipy `
             --exclude-module matplotlib `
             --exclude-module pandas `
-            launcher.py
+            backend/launcher.py
           if (Test-Path dist/OkhslToneCurve.exe) {
-            Move-Item dist/OkhslToneCurve.exe ../OkhslToneCurve_win.exe
+            Move-Item dist/OkhslToneCurve.exe ./OkhslToneCurve_win.exe
           } else {
             echo "Error: OkhslToneCurve.exe not found in dist/"
             exit 1
