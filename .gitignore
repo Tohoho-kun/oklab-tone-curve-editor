@@ -1,0 +1,18 @@
+# Python 一時ファイル
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# ビルド生成物 (PyInstaller)
+backend/build/
+backend/dist/
+backend/*.spec
+
+# OS一時ファイル
+.DS_Store
+Thumbs.db
+
+# プロジェクト固有の一時ファイル
+backend/gen_noise*
