@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 必要なライブラリのインストール (scipy を除外して軽量化)
-pip install pyinstaller tifffile numpy fastapi uvicorn pydantic starlette pillow
+pip install pyinstaller tifffile numpy fastapi uvicorn pydantic starlette pillow python-multipart
 
 echo "Building Lightweight Standalone App for Mac..."
 
@@ -12,6 +12,7 @@ echo "Building Lightweight Standalone App for Mac..."
 pyinstaller --noconsole --onefile \
     --name "OkhslToneCurve" \
     --add-data "../frontend:frontend" \
+    --collect-all multipart \
     --exclude-module scipy \
     --exclude-module matplotlib \
     --exclude-module pandas \
